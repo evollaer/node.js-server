@@ -39,7 +39,6 @@ app.use((req, res, next) => {
     next()
     return
   }
-  console.log(req.headers);
   const token = req.headers["authorization"].split(" ")[1]
   console.log(token,'token');
   if (token) {

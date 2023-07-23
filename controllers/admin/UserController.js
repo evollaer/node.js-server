@@ -29,7 +29,71 @@ const UserController = {
                 }
             })
         }
-    }
+    },
+    upload: async (req, res) => {
+        console.log(req.body, req.file);
+        const { username, introduction, gender } = req.body
+        const token = req.headers["authorization"].split(" ")[1]
+        const avatar = req.file ? `/avataruploads/${req.file.filename}` : ''
+        console.log(token, 'token');
+        if (token) {
+            var playload = JWT.verify(token)
+        }
+        //调用service模块更新数据
+        await UserService.upload({
+            _id: playload._id, username, introduction,
+            gender: Number(gender), avatar
+        })
+        if (avatar) {
+            res.send({
+                ActionType: "OK",
+                data: {
+                    username, introduction, avatar, gender: Number(gender)
+                }
+            })
+        } else {
+            res.send({
+                ActionType: "OK",
+                data: {
+                    username, introduction, gender: Number(gender)
+                }
+            })
+        }
+    },
+    add: async (req, res) => {
+        const { username, password, role, introduction, gender } = req.body
+        const avatar = req.file ? `/avataruploads/${req.file.filename}` : ""// 保存头像数据名
+        await UserService.add({ username, password, role: Number(role), gender: Number(gender), introduction, avatar })
+        res.send({ ActionType: "OK" })
+    },
+    
+
+    // 获取用户列表数据
+    getList: async (req, res) => {
+        console.log(req.params,'req');
+        const result = await UserService.getList(req.params)
+        res.send({
+            ActionType:"OK",
+            data:result
+        })
+    },
+
+    // 删除用户数据
+    delList:async (req,res)=>{
+        // console.log('要删除的用户id',req.params.id)
+        const result = await UserService.delList({_id:req.params.id})
+        res.send({
+            ActionType: "OK"
+        })
+    },
+    
+    // 修改用户数据(用户列表)
+    putList:async (req,res)=>{
+        const result = await UserService.putList(req.body)
+        res.send({
+            ActionType: "OK"
+        })
+    },
 }
 
 module.exports = UserController
